@@ -34,7 +34,7 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) :
  * However, it also needs to run early on the init hook.
  *
  * @author Jason Conroy <jason@findingsimple.com>
- * @package Simple qTips
+ * @package Simple MCE Tables
  * @since 1.0
  */
 function initialize_mce_tables(){
