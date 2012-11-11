@@ -120,7 +120,7 @@ class Simple_MCE_Tables {
 	public static function get_url( $file ) {
 
 		// Get the path of this file after the WP content directory
-		$post_content_path = substr( dirname( __FILE__ ), strpos( __FILE__, basename( WP_CONTENT_DIR ) ) + strlen( basename( WP_CONTENT_DIR ) ) );
+		$post_content_path = substr( dirname( str_replace('\\','/',__FILE__) ), strpos( __FILE__, basename( WP_CONTENT_DIR ) ) + strlen( basename( WP_CONTENT_DIR ) ) );
 
 		// Return a content URL for this path & the specified file
 		return content_url( $post_content_path . $file );
