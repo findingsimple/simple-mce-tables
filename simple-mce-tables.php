@@ -38,7 +38,15 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) :
  * @since 1.0
  */
 function initialize_mce_tables(){
-	Simple_MCE_Tables::init();
+	
+	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+	if ( !is_plugin_active('mce-table-buttons/mce_table_buttons.php') && !is_plugin_active('tinymce-advanced/tinymce-advanced.php') ) {
+
+		Simple_MCE_Tables::init();
+	
+	}
+	
 }
 add_action( 'init', 'initialize_mce_tables', -1 ); 
 
