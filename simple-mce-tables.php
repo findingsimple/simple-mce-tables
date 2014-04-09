@@ -3,13 +3,13 @@
 Plugin Name: Simple MCE Tables
 Plugin URI: http://plugins.findingsimple.com
 Description: Adds tiny mce table buttons to the WordPress Editor
-Version: 1.0
-Author: Finding Simple (Jason Conroy & Brent Shepherd)
+Version: 2.0
+Author: Finding Simple
 Author URI: http://findingsimple.com
 License: GPL2
 */
 /*
-Copyright 2008 - 2013  Finding Simple  (email : plugins@findingsimple.com)
+Copyright 2008 - 2014  Finding Simple  (email : plugins@findingsimple.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -46,14 +46,11 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) {
 	 * Plugin Main Class.
 	 *
 	 * @package Simple MCE Tables
-	 * @since 1.0
 	 */
 	class Simple_MCE_Tables {
 
 		/**
 		 * Initialize the class
-		 *
-		 * @since 1.0
 		 */
 		public static function init() {
 
@@ -63,33 +60,33 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) {
 
 		/**
 		 * Hook into WP filters to add the table MCE buttons 
-		 *
-		 * @since 1.0
 		 */
 		public static function table_addbuttons() {
-		
-			// Don't bother doing this stuff if the current user lacks permissions
-			if ( ! current_user_can('edit_posts') && ! current_user_can('edit_pages') )
-				return;
-		 
-			// Add only in Rich Editor mode
-			if ( get_user_option('rich_editing') == 'true') {
-		
-				add_filter('mce_external_plugins', array( __CLASS__, 'add_table_plugin') );
+
+			global $tinymce_version;
+
+			if ( version_compare( $tinymce_version, '400', '<' ) ) {
+
+				add_filter('mce_external_plugins', array( __CLASS__, 'add_table_plugin_3') );
 				
 				//Put buttons on the third line of the editor
-				add_filter('mce_buttons_3', array( __CLASS__, 'register_table_button' ) );
+				add_filter('mce_buttons_3', array( __CLASS__, 'register_table_button_3' ) );
+
+			} else {
+
+				add_filter('mce_external_plugins', array( __CLASS__, 'add_table_plugin_4') );
 				
+				//Put buttons on the second line of the editor
+				add_filter('mce_buttons_2', array( __CLASS__, 'register_table_button_4' ) );
+
 			}
-		   
+						   
 		}
 
 		/**
 		 * Register table controls
-		 *
-		 * @since 1.0
 		 */	 
-		public static function register_table_button($buttons) {
+		public static function register_table_button_3($buttons) {
 		
 			array_push($buttons, "tablecontrols");
 			return $buttons;
@@ -98,12 +95,36 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) {
 
 		/**
 		 * Add TinyMCE table plugin
-		 *
-		 * @since 1.0
 		 */	 
-		public static function add_table_plugin($plugin_array) {
+		public static function add_table_plugin_3($plugin_array) {
 			
-			$plugin_array['table'] = self::get_url( '/table/editor_plugin.js', __FILE__ );
+			$plugin_array['table'] = self::get_url( '/table-3/editor_plugin.js', __FILE__ );
+			return $plugin_array;
+		
+		}
+
+
+		/**
+		 * Register table controls
+		 */	 
+		public static function register_table_button_4($buttons) {
+		
+			// in case someone is manipulating other buttons, drop table controls at the end of the row
+			if ( ! $pos = array_search( 'undo', $buttons ) ) {
+				array_push( $buttons, 'table' );
+				return $buttons;
+			}
+
+			return array_merge( array_slice( $buttons, 0, $pos ), array( 'table' ), array_slice( $buttons, $pos ) );
+
+		}
+
+		/**
+		 * Add TinyMCE table plugin
+		 */	 
+		public static function add_table_plugin_4($plugin_array) {
+			
+			$plugin_array['table'] = self::get_url( '/table-4/plugin.min.js', __FILE__ );
 			return $plugin_array;
 		
 		}
@@ -113,9 +134,6 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) {
 		 * 
 		 * As this plugin may be used as both a stand-alone plugin and as a submodule of 
 		 * a theme, the standard WP API functions, like plugins_url() can not be used. 
-		 *
-		 * @since 1.0
-		 * @return array $post_name => $post_content
 		 */
 		public static function get_url( $file ) {
 
