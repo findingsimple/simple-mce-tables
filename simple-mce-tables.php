@@ -109,12 +109,17 @@ if ( ! class_exists( 'Simple_MCE_Tables' ) ) {
 		 */	 
 		public static function register_table_button_4($buttons) {
 		
-			// in case someone is manipulating other buttons, drop table controls at the end of the row
+			/**
+			 * If the buttons have been modified just put the table button at the end of the second row
+			 */
 			if ( ! $pos = array_search( 'undo', $buttons ) ) {
 				array_push( $buttons, 'table' );
 				return $buttons;
 			}
 
+			/**
+			 * Else put the table button before the undo, previous and shortcode buttons
+			 */
 			return array_merge( array_slice( $buttons, 0, $pos ), array( 'table' ), array_slice( $buttons, $pos ) );
 
 		}
